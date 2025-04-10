@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
+import '/models/user.dart';
 import 'package:http/http.dart' as http; // httpという変数を通して、httpパッケージにアクセス
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:my_first_application/models/article.dart';
+import 'package:my_first_application/widgets/article_container.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -17,35 +19,45 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Qiita Search'),
-      ),
+      appBar: AppBar(title: const Text('Qiita Search')),
       body: Column(
-      children: [
-      // 検索ボックス
-        Padding( // ← Paddingで囲む
-          padding: const EdgeInsets.symmetric(
-            vertical: 12,
-            horizontal: 36,
-          ),
-          child: TextField(
-            style: TextStyle( // ← TextStyleを渡す
-              fontSize: 18,
-              color: Colors.black,
+        children: [
+          // 検索ボックス
+          Padding(
+            // ← Paddingで囲む
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 36),
+            child: TextField(
+              style: TextStyle(
+                // ← TextStyleを渡す
+                fontSize: 18,
+                color: Colors.black,
+              ),
+              decoration: InputDecoration(
+                // ← InputDecorationを渡す
+                hintText: '検索ワードを入力してください',
+              ),
+              onSubmitted: (String value) async {
+                final results = await searchQiita(value); // ← 検索処理を実行する
+                setState(() => articles = results); // 検索結果を代入
+              },
             ),
-            decoration: InputDecoration( // ← InputDecorationを渡す
-              hintText: '検索ワードを入力してください',
-            ),
-            onSubmitted: (String value) async {
-              final results = await searchQiita(value); // ← 検索処理を実行する
-              setState(()=>articles = results); // 検索結果を代入
-            },
           ),
-        ),
-      // 検索結果一覧
-      ],
-    ),
-
+          // 検索結果一覧
+          ArticleContainer(
+            article: Article(
+              title: 'テスト',
+              user: User(
+                id: 'qii-taro',
+                profileImageUrl:
+                    'https://firebasestorage.googleapis.com/v0/b/gs-expansion-test.appspot.com/o/unknown_person.png?alt=media',
+              ),
+              createdAt: DateTime.now(),
+              tags: ['Flutter', 'dart'],
+              url: 'https://example.com',
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -61,9 +73,10 @@ Future<List<Article>> searchQiita(String keyword) async {
   final String token = dotenv.env['QIITA_ACCESS_TOKEN'] ?? '';
 
   // 2. Qiita APIにリクエストを送る
-  final http.Response res = await http.get(uri, headers: {
-    'Authorization': 'Bearer $token',
-  });
+  final http.Response res = await http.get(
+    uri,
+    headers: {'Authorization': 'Bearer $token'},
+  );
 
   // 3. 戻り値をArticleクラスの配列に変換
   // 4. 変換したArticleクラスの配列を返す(returnする)

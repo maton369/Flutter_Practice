@@ -1,9 +1,6 @@
 class User {
   // コンストラクタ
-  User({
-    required this.id,
-    required this.profileImageUrl,
-  });
+  User({required this.id, required this.profileImageUrl});
 
   // プロパティ
   final String id;
