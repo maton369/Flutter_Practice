@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
 import 'dart:convert';
-import '/models/user.dart';
-import 'package:http/http.dart' as http; // httpという変数を通して、httpパッケージにアクセス
+
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http; // httpという変数を通して、httpパッケージにアクセス
 import 'package:my_first_application/models/article.dart';
 import 'package:my_first_application/widgets/article_container.dart';
 
@@ -43,17 +43,12 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ),
           // 検索結果一覧
-          ArticleContainer(
-            article: Article(
-              title: 'テスト',
-              user: User(
-                id: 'qii-taro',
-                profileImageUrl:
-                    'https://firebasestorage.googleapis.com/v0/b/gs-expansion-test.appspot.com/o/unknown_person.png?alt=media',
-              ),
-              createdAt: DateTime.now(),
-              tags: ['Flutter', 'dart'],
-              url: 'https://example.com',
+          Expanded(
+            child: ListView(
+              children:
+                  articles
+                      .map((article) => ArticleContainer(article: article))
+                      .toList(),
             ),
           ),
         ],
